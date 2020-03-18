@@ -1,0 +1,33 @@
+version: "3.5"
+
+services:
+
+  django: &django
+    build: ./app/
+    ports:
+      - 8000:8000
+    container_name: test-app-api
+    depends_on:
+      - db
+    env_file:
+      - .env.local
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./app:/usr/src/app
+      - static:/usr/src/app/static
+      - media:/usr/src/app/media
+    restart: always
+
+  db:
+    image: postgres:12
+    ports:
+      - 5432:5432
+    env_file:
+      - .env.local
+    container_name: test-app-db
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data/dbdata
+
+volumes:
+  static:
+  media:
