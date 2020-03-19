@@ -1,9 +1,12 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.generics import ListAPIView
 from .serializers import PostSerializer, LikeSerializer
-from posts.models import Post
+from posts.models import Post, Like
 from rest_framework.decorators import action
 from posts.servises import LikeService
+from posts.filters import PostAnalyticFilter
+from django_filters import rest_framework as filters
 
 
 class PostViewSet(ModelViewSet):
@@ -31,3 +34,20 @@ class PostViewSet(ModelViewSet):
         queryset = LikeService.analytics(pk)
         serializer = LikeSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class AnalyticsAPIView(ListAPIView):
+    queryset = Like.objects.all()
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = PostAnalyticFilter
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        data = [
+            {
+                'total': queryset.count(),
+            }
+        ]
+
+        return Response(data)

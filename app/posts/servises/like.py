@@ -14,10 +14,5 @@ class LikeService:
         Like.objects.filter(post_id=post_pk, user=user).delete()
 
     @classmethod
-    def analytics(cls, post_pk, date_from=None, date_to=None):
-        queryset = Like.objects.filter(post_id=post_pk)
-
-        if date_from and date_to:
-            queryset = queryset.filter()
-
-        return queryset
+    def analytics(cls, post_pk):
+        return Like.objects.filter(post_id=post_pk)
